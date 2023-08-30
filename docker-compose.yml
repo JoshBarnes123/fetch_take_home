@@ -5,6 +5,13 @@ services:
     ports:
     - "4566:4566" 
   postgres: 
+    build:
+      context: buildContext
+      dockerfile: Dockerfile
     image: fetchdocker/data-takehome-postgres 
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
     ports:
       - 5432:5432
+      
