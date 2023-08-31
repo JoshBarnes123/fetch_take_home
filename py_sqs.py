@@ -1,35 +1,30 @@
 import boto3
+import json
+import pandas as pd
+boto3.compat.filter_python_deprecation_warnings()
 
-print("hello, world")
-# client = boto3.client('sqs', endpoint_url="http://localhost:4566/_aws/sqs/messages", region_name='us-east-2', aws_access_key_id='123', aws_secret_access_key='123')
-# result = client.receive_message(QueueUrl="http://localhost:4566/000000000000/login-queue")
+ENDPOINT_URL = "http://localhost:4566/_aws/sqs/messages"
+AWS_S3_CREDS = {
+    "aws_access_key_id":"foobar",
+    "aws_secret_access_key":"foobar"
+}
 
-sqs_url = "http://localhost:4566/000000000000/login-queue"
-result = boto3.client('sqs', region_name='us-east-2')
-xx = result.list_queues()
+client = boto3.client("sqs", endpoint_url=ENDPOINT_URL, **AWS_S3_CREDS, region_name="us-east-1")
+result = client.receive_message(QueueUrl="http://localhost:4566/000000000000/login-queue")
+#--
+# result_json = json.dumps(result, indent=4)
+# response_subset = result["Messages"][0]["Body"]
 
-# sqs = boto3.resource('sqs', region_name='us-east-2')
-# queue = sqs.Queue(sqs_url)
+# desired_data = json.loads(response_subset)
+# desired_data_subset = desired_data["user_id"]
+# print(desired_data)
+# print(desired_data_subset)
+#--
+result_json = json.dumps(result, indent=4)
+response_subset = result["Messages"][0]["Body"]
+desired_data = json.loads(response_subset)
 
+record =  pd.DataFrame(columns=["user_id", "device_type", "masked_ip", "masked_device_id", "locale", "app_version", "create_date"]).fillna(2)
 
-# xx = queue.list_queues()
-# print(queue)
-
-
-
-# result = sqs.receive_message(QueueUrl="http://localhost:4566/000000000000/login-queue")
-# print(result)
-# response = client.receive_message(
-#         QueueUrl='http://localhost:4566/000000000000/login-queue',
-#         AttributeNames=[
-#             'SentTimestamp'
-#         ],
-#         MaxNumberOfMessages=10,
-#         MessageAttributeNames=[
-#             'All'
-#         ],
-#         VisibilityTimeout=0,
-#         WaitTimeSeconds=0
-#     )
-
-# awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/login-queue
+record =  pd.DataFrame()
+record["user_id"] = "NAN"
